@@ -42,12 +42,18 @@ class GenusController extends Controller
     }
 
     /**
-     * @Route("/genus/{genusName}")
+     * @Route("/genus/{genusName}", name="genus_show")
      */
     public function showAction($genusName)
     {
-        $funFact = 'Octopuses can change the color of their body in just *three-tenths* of a second!';
+        $em = $this->getDoctrine()->getManager();
+        $genus = $em->getRepository(Genus::class)->findOneBy(['name' => $genusName]);
 
+        if (false === $genus) {
+            throw $this->createNotFoundException('No genus found');
+        }
+
+        /*
         $cache = $this->get('doctrine_cache.providers.my_markdown_cache');
         $key = md5($funFact);
         if ($cache->contains($key)) {
@@ -58,10 +64,10 @@ class GenusController extends Controller
             $funFact = $this->get('markdown.parser')->transform($funFact);
             $cache->save($key, $funFact);
         }
+        */
 
         return $this->render('genus/show.html.twig', array(
-            'name' => $genusName,
-            'funFact' => $funFact,
+            'genus' => $genus,
         ));
     }
 
